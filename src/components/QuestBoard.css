@@ -1,0 +1,395 @@
+/* ===== Экран с доской квестов ===== */
+@font-face {
+    font-family: "molodost";
+    src: url('/molodost.ttf');
+}
+
+.quest-board-screen {
+    position: relative;
+    /* width: 100%; */
+    width: 2000px;
+    min-height: 100vh;
+    background: url("/images/board-empty.png") center/cover no-repeat;
+    /* min-height: 540px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+    /* тёмный фон вокруг доски */
+}
+
+/* Контейнер доски: фиксированное соотношение 16:9 */
+
+.quest-board {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 1200px;
+}
+
+/* Фон доски (картинка) */
+
+/* .quest-board-bg {
+    position: absolute;
+    inset: 0;
+    background: url("/images/board-empty.png") center/cover no-repeat;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+} */
+
+/* ===== Листки на доске ===== */
+
+/* Контейнер листков внутри доски.
+   inset подгони под свою картинку, чтобы листки были на деревянной части. */
+.quest-board-inner {
+    position: relative;
+    top: 110px;
+    left: 280px;
+    width: 1260px;
+    height: 900px;
+
+}
+
+.quest-board-notes {
+    position: absolute;
+    inset: 12% 7% 12% 7%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    gap: 8px;
+}
+
+/* Базовый стиль листка (кнопка) */
+
+.quest-note {
+    position: absolute;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background: transparent;
+    transform-origin: center top;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Маленький листок на доске: 5 штук в ряд, 2 ряда.
+   aspect-ratio держит форму спрайта. */
+
+.quest-note--small {
+    /* flex: 0 0 calc(20% - 8px); */
+    /* 5 в ряд */
+    /* aspect-ratio: 4 / 3; */
+    /* подгони под реальный спрайт */
+    transform: rotate(var(--note-rotation, 0deg));
+}
+
+/* Картинка листка */
+
+.quest-note-bg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Текстовый слой поверх спрайта */
+
+.quest-note-content {
+    position: absolute;
+    /* внутренние отступы от краёв картинки листка;
+     настрой под свою картинку */
+    inset: 15% 11% 20% 11%;
+    padding: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: "Georgia", serif;
+    font-size: 11px;
+    color: #3b2b1a;
+}
+
+/* Заголовок: максимум 2 строки, остальное обрежем */
+
+.quest-title {
+    font-family: 'molodost';
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 2em;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+/* Компания: максимум 2 строки */
+
+.quest-company {
+    font-size: 11px;
+    margin-bottom: 2px;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+/* Город и опыт: по одной строке, многоточие, если не влезло */
+
+.quest-city,
+.quest-exp {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Подпись внизу */
+
+.quest-link {
+    margin-top: auto;
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* Ховер-анимация листка */
+
+.quest-note:hover {
+    transform: translateY(-4px) scale(1.03) rotate(var(--note-rotation, 0deg));
+    /* box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7); */
+}
+
+/* ===== Модалка с большим листком (подробная вакансия) ===== */
+
+.quest-modal-backdrop {
+    /* position: fixed; */
+    position: absolute;
+    box-sizing: border-box;
+    padding: 100px;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* Контейнер модалки */
+
+.quest-modal {
+    position: relative;
+    /* максимальный размер листка с учётом экрана */
+    width: min(90vw, calc(90vh * 4 / 3));
+    aspect-ratio: 4 / 3;
+    /* пропорции свитка */
+    max-height: 90vh;
+}
+
+.quest-modal-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* рабочая область текста — ПРОЦЕНТЫ от свитка */
+.quest-modal-content {
+    position: absolute;
+    inset: 14% 24% 10% 28%;
+    /* можно поиграться цифрами, чтобы попасть в центр свитка */
+    overflow: hidden;
+    font-family: "Georgia", serif;
+    color: #3b2b1a;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 80px 100px 40px;
+
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.quest-modal-description {
+    margin-top: 8px;
+    line-height: 1.3;
+    flex-grow: 1;
+
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
+
+
+.quest-modal-description p {
+    margin: 4px 0;
+    text-indent: 1.3em;
+    /* красивый красный отступ */
+}
+
+.quest-modal-title {
+    margin: 0 0 6px 0;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'molodost';
+    font-size: 2em;
+}
+
+.quest-modal-meta {
+    margin: 1px 0;
+}
+
+
+
+/* Списки, которые часто приходят в description */
+
+.quest-modal-description ul,
+.quest-modal-description ol {
+    margin-left: 1.3em;
+}
+
+/* Ссылка на hh */
+
+.quest-modal-link {
+    margin-top: 10px;
+    display: flex;
+    font-size: 1em;
+    background: url('/button-texture.PNG') center/cover no-repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: auto;
+    justify-content: center;
+    width: 250px;
+    color: white;
+    font-family: 'molodost';
+    font-size: 1.3em;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-decoration: none;
+}
+
+
+
+/* Кнопка закрытия */
+
+.quest-modal-close {
+    position: absolute;
+    top: -16px;
+    right: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: none;
+    background: #b91c1c;
+    color: #fef2f2;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Экран загрузки внутри модалки */
+
+.quest-modal-loading {
+    padding: 16px 24px;
+    border-radius: 12px;
+    background: #111827;
+    color: #e5e7eb;
+    font-size: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+.quest-search-bar {
+    position: absolute;
+    top: 5%;
+    /* left: 20%; */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+}
+
+.quest-search-bar input {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 24px;
+    font-family: 'molodost';
+    width: 300px;
+}
+
+.quest-search-bar button {
+    font-family: 'molodost';
+    background-color: #d3b77a;
+    font-size: 1.6em;
+    width: 100%;
+
+}
+
+.quest-board-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    color: #e5e7eb;
+    font-size: 18px;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+}
+
+.quest-status {
+    margin-top: 8px;
+    text-align: center;
+    color: #e5e7eb;
+}
+
+.quest-status--error {
+    color: #fecaca;
+}
+
+
+/* ===== Адаптив под более узкие экраны ===== */
+
+@media (max-width: 900px) {
+    .quest-board-notes {
+        inset: 14% 8% 14% 8%;
+        gap: 6px;
+    }
+
+    /* вместо 5 листков в ряд – 3 */
+    .quest-note--small {
+        flex: 0 0 calc(33.333% - 6px);
+    }
+
+    .quest-note-content {
+        font-size: 10px;
+    }
+
+    .quest-title {
+        font-size: 11px;
+        font-family: 'molodost';
+    }
+}
+
+
+
+@media (max-width: 600px) {
+
+    /* 2 листка в ряд */
+    .quest-note--small {
+        flex: 0 0 calc(50% - 6px);
+    }
+
+    .quest-modal {
+        width: 100%;
+        height: 80vh;
+    }
+
+    .quest-modal-content {
+        inset: 30px 24px 30px 28px;
+    }
+}
