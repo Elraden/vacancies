@@ -6,7 +6,7 @@ const HH_HEADERS = {
     "HH-User-Agent": "CareerRPG/0.1 (alexsmi1992@gmail.com)",
 };
 
-const NOTE_SPRITES = ["/images/note-1.png", "/images/note-2.png", "/images/note-3.png"];
+const NOTE_SPRITES = ["images/note-1.png", "images/note-2.png", "images/note-3.png"];
 
 // размеры листка внутри внутренней области доски (в процентах)
 const CARD_W = 20; // ширина
